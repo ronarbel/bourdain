@@ -1,13 +1,12 @@
 [project]
-name = "foodorder"
+name = "bourdain-bot"
 version = "0.1.0"
 description = "Telegram bot that automates Instacart grocery ordering"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
     "python-telegram-bot>=22.0",
     "playwright>=1.40",
     "anthropic>=0.40.0",
-    "openai>=1.0",
     "pyyaml>=6.0",
     "python-dotenv>=1.0",
     "pydantic>=2.0",

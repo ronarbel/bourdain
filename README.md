@@ -1,26 +1,36 @@
-# Food Order Bot
+# Bourdain Bot
 
-A Telegram bot that takes natural language grocery orders (text or voice) and automates placing them on Instacart via browser automation.
+*"Your body is not a temple, it's an amusement park. Enjoy the ride."* — Anthony Bourdain
+
+A personal sous-chef that lives in your pocket. Text Bourdain what you need — *"get me 2 granolas and some bananas"* — and he'll walk into the store, grab exactly the right stuff off the shelf, and have it delivered to your door. No browsing. No scrolling through 47 brands of yogurt. Just the good stuff, the stuff you actually want.
+
+Because life's too short for the wrong granola.
+
+---
 
 ## How It Works
 
+You talk. Bourdain shops.
+
 ```
-You (Telegram) → send "get 2 granolas and 3 bananas"
-  → Claude Haiku parses into structured order
-  → Playwright opens Instacart (Rainbow Grocery)
-  → Adds items to cart
-  → Sends you a cart summary with prices
-  → You reply CHECKOUT → order is placed
+You (Telegram) → "get 2 granolas and 3 bananas"
+  → AI parses your order
+  → Browser automation hits Instacart
+  → Finds your exact items at Rainbow Grocery
+  → Adds them to cart
+  → Sends you a screenshot to confirm
+  → You say CHECKOUT → groceries are on their way
 ```
 
-Voice notes work too — they're transcribed via OpenAI Whisper before parsing.
+Bourdain knows your preferences. He knows you want the Purely Elizabeth granola, not some impostor. He knows your yogurt is Bellwether Farms A2 Organic, and he won't settle for less. Items are matched **strict** or **fuzzy** — strict means exact match or nothing, fuzzy means best effort (any banana is a good banana).
+
+---
 
 ## Setup
 
 ### Prerequisites
 
 - Python 3.9+
-- FFmpeg: `brew install ffmpeg`
 - A Telegram account
 - An Instacart account with saved payment method and delivery address
 
@@ -29,7 +39,7 @@ Voice notes work too — they're transcribed via OpenAI Whisper before parsing.
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install python-telegram-bot playwright anthropic openai pyyaml python-dotenv pydantic pydantic-settings
+pip install python-telegram-bot playwright anthropic pyyaml python-dotenv pydantic pydantic-settings
 playwright install chromium
 ```
 
@@ -50,7 +60,6 @@ Edit `.env` and fill in:
 ```
 TELEGRAM_BOT_TOKEN=<from BotFather>
 ANTHROPIC_API_KEY=<your Anthropic key>
-OPENAI_API_KEY=<your OpenAI key, for voice transcription>
 ```
 
 ### 4. Start the bot
@@ -62,49 +71,56 @@ python -m src.main
 
 ### 5. Log in to Instacart
 
-Send `/login` to your bot on Telegram. A browser window will open — log in to your Instacart account manually. Once done, press Enter in the terminal. Your session is saved to `auth_state.json` so you don't need to log in again.
+Send `/login` to your bot on Telegram. A browser window will open on your machine — log in to your Instacart account. Once done, send `/done`. Your session is saved to `auth_state.json` and persists across restarts.
+
+---
 
 ## Usage
 
 ### Placing an order
 
-Send a message like:
+Just text Bourdain like you'd text a friend:
 
-- "Get 2 granolas and 3 yogurts"
-- "I need bananas"
-- "Order 1 yogurt and 5 bananas"
-
-Or send a voice note saying the same thing.
+- *"Get 2 granolas and 3 yogurts"*
+- *"I need bananas"*
+- *"Order 1 yogurt and 5 bananas"*
 
 The bot will:
 
-1. Parse your order and show what it understood
+1. Parse your order and confirm what it understood
 2. Ask you to reply **YES** to add items to your Instacart cart
-3. Add items via browser automation
-4. Show a cart summary with actual prices
+3. Add items via browser automation (with strict matching for the items that matter)
+4. Send you a screenshot of the cart for confirmation
 5. Ask you to reply **CHECKOUT** to place the order
 
 Reply **NO** or **CANCEL** at any step to abort.
 
 ### Bot commands
 
-| Command  | Description                        |
-|----------|------------------------------------|
-| `/start` | Welcome message and usage info     |
-| `/items` | List all available items           |
-| `/login` | Log in to Instacart (opens browser)|
+| Command  | Description                          |
+|----------|--------------------------------------|
+| `/start` | Welcome message and usage info       |
+| `/items` | List all available items             |
+| `/login` | Log in to Instacart (opens browser)  |
+| `/done`  | Finish login after logging in        |
 
-## Available Items
+---
 
-Configured in `config/items.yaml`. Current items (all from Rainbow Grocery):
+## The Menu
 
-| Alias      | Product                                                         |
-|------------|-----------------------------------------------------------------|
-| `granola`  | Purely Elizabeth Original Ancient Grain Granola, Organic (10 oz) |
-| `yogurt`   | Bellwether Farms A2 Organic Whole Milk Yogurt, Plain (32 oz)    |
-| `bananas`  | Organic Bananas                                                 |
+Your items are configured in `config/items.yaml`. Each item has a short alias (what you say), a search term (what Instacart sees), and a match mode:
 
-All items support quantity — say "3 granolas" to order 3.
+| Alias      | Product                                                    | Match  |
+|------------|------------------------------------------------------------|--------|
+| `granola`  | Purely Elizabeth Original Ancient Grain Granola, Organic    | strict |
+| `yogurt`   | Bellwether Farms A2 Organic Whole Milk Yogurt, Plain       | strict |
+| `bananas`  | Organic Bananas                                            | fuzzy  |
+
+**Strict** = must be the exact product, or Bourdain refuses and sends you a screenshot of what he found instead. No substitutions on the things that matter.
+
+**Fuzzy** = best effort. Close enough is good enough. A banana is a banana.
+
+---
 
 ## Adding New Items
 
@@ -114,35 +130,44 @@ Edit `config/items.yaml`:
 items:
   peanut_butter:
     search_term: "Smucker's Natural Peanut Butter 16 oz"
-    display_name: "Smucker's Natural Peanut Butter (16 oz)"
+    display_name: "Smucker's Natural Peanut Butter"
+    match: strict
     default_quantity: 1
 ```
 
-The `search_term` is what gets typed into Instacart's search bar. Make it specific enough to return the right product as the first result.
+The `search_term` is what gets typed into Instacart's search. Make it specific enough to return the right product as the first result. The `display_name` is matched against Instacart's product name for strict items.
+
+---
 
 ## Project Structure
 
 ```
-foodorder/
-├── pyproject.toml          # Project metadata and dependencies
+bourdain_bot/
+├── pyproject.toml          # Dependencies
 ├── .env                    # API keys (not committed)
 ├── .env.example            # Template for .env
 ├── .gitignore
 ├── auth_state.json         # Saved Instacart session (not committed)
 ├── config/
-│   └── items.yaml          # Item aliases → product mappings
+│   └── items.yaml          # Your menu — item aliases and preferences
 └── src/
-    ├── main.py             # Entry point — loads config, starts bot
-    ├── config.py           # Settings (env vars) + YAML config loader
+    ├── main.py             # Entry point
+    ├── config.py           # Settings + YAML config loader
     ├── bot.py              # Telegram bot handlers and order flow
-    ├── parser.py           # Claude Haiku NLP → structured order
-    ├── transcriber.py      # Voice note (.ogg) → text via Whisper
+    ├── parser.py           # Claude Haiku NLP — turns text into structured orders
     └── instacart.py        # Playwright browser automation for Instacart
 ```
 
+---
+
 ## Notes
 
-- **Instacart selectors**: Instacart's UI changes frequently. If automation breaks, the CSS selectors in `src/instacart.py` may need updating.
-- **Anti-bot detection**: The automation uses human-like delays between actions. If you hit CAPTCHAs, try running with `headless=False` (set `HEADLESS=false` in `.env` or edit `config.py`).
+- **Instacart selectors**: Instacart's UI changes. If automation breaks, the selectors in `src/instacart.py` may need updating.
+- **Anti-bot detection**: The bot uses human-like delays between actions. If you hit CAPTCHAs, try running with `headless=False` in `src/config.py`.
 - **Session expiry**: If your Instacart session expires, run `/login` again.
-- **Costs**: Each order parse uses Claude Haiku (~$0.001). Voice transcription uses Whisper (~$0.006/min).
+- **Costs**: Each order parse uses Claude Haiku (~$0.001 per order). Practically free.
+- **Runs locally**: The bot runs on your Mac. Your machine needs to be on for orders to process. Cloud deployment is a future option.
+
+---
+
+*Built with good taste.*
