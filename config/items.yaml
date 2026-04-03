@@ -1,0 +1,22 @@
+store:
+  name: "Rainbow Grocery"
+  instacart_slug: "rainbow-grocery"
+
+items:
+  granola:
+    search_term: "Purely Elizabeth Original Ancient Grain Granola Organic 10 oz"
+    display_name: "Purely Elizabeth Original Ancient Grain Granola, Organic"
+    match: strict
+    default_quantity: 1
+
+  yogurt:
+    search_term: "Bellwether Farms A2 Organic Whole Milk Yogurt Plain 32 oz"
+    display_name: "Bellwether Farms A2 Organic Whole Milk Yogurt, Plain (32 oz)"
+    match: strict
+    default_quantity: 1
+
+  bananas:
+    search_term: "Organic Bananas"
+    display_name: "Organic Bananas"
+    match: fuzzy
+    default_quantity: 1

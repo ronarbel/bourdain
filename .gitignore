@@ -1,0 +1,10 @@
+.env
+auth_state.json
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/
+debug/
+debug_*.py
+do_checkout.py
