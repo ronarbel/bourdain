@@ -1,10 +1,8 @@
-# Bourdain Bot
+# Your Personal Bourdain
 
-*"Your body is not a temple, it's an amusement park. Enjoy the ride."* — Anthony Bourdain
+*"You learn a lot about someone when you share a meal together."* — Anthony Bourdain
 
-A personal sous-chef that lives in your pocket. Text Bourdain what you need — *"get me 2 granolas and some bananas"* — and he'll walk into the store, grab exactly the right stuff off the shelf, and have it delivered to your door. No browsing. No scrolling through 47 brands of yogurt. Just the good stuff, the stuff you actually want.
-
-Because life's too short for the wrong granola.
+A personal sous-chef that lives in your pocket. Text Bourdain what you need — *"get me 2 granolas and some bananas"* — and he'll walk to the nearest market, pick out the freshest ingredients for you, and deliver them to your door. No browsing. No scrolling through 47 brands of yogurt. Just the good stuff.
 
 ---
 
