@@ -1,6 +1,6 @@
 # Your Personal Bourdain
 
-*"You learn a lot about someone when you share a meal together."* — Anthony Bourdain
+*"Cooking is all about people. Food is maybe the only universal thing that really has the power to bring everyone together."* — Anthony Bourdain
 
 A personal sous-chef that lives in your pocket. Text Bourdain what you need — *"get me 2 granolas and some bananas"* — and he'll walk to the nearest market, pick out the freshest ingredients for you, and deliver them to your door. No browsing. No scrolling through 47 brands of yogurt. Just the good stuff.
 
